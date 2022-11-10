@@ -1,0 +1,3 @@
+SHA256(UbuntuServer.ovf)= 509db6590611c93b32dae8320bc26dcfacf9f2a01eb43c799e80fb39f016eb1a
+SHA256(UbuntuServer_disk0.vmdk)= 07aaa0aef1daf9df453badf2e72b54dff092664eabe64de623a0985526c30449
+SHA256(UbuntuServer_file0.nvram)= d90fcce6c2b72635a721f32d7a01732f49369eec6fc80a4984ce2af31b811cb0

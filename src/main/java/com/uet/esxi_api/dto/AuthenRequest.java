@@ -9,10 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewVM {
-	private String name;
-	private String os;
-	private Integer numCpu;
-	private Integer ramGB;
-	private Integer storage;
+public class AuthenRequest {
+	private String username;
+	private String password;
 }

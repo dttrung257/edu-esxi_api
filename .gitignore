@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+src/main/resources/ubuntu/UbuntuServer_disk0.vmdk
+src/main/resources/window/WindowServer_disk0.vmdk
