@@ -1,9 +1,12 @@
 <# Variable #>
-$Name = $args[0]
-$OS = $args[1]
-$CPU = $args[2]
-$RAM = $args[3]
-$Storage = $args[4]
+$IpServer = $args[0]
+$ServerUsername = $args[1]
+$Password = $args[2]
+$Name = $args[3]
+$OS = $args[4]
+$CPU = $args[5]
+$RAM = $args[6]
+$Storage = $args[7]
 $OvfPath
 
 If ($OS -eq "UBUNTU") {
@@ -11,10 +14,10 @@ If ($OS -eq "UBUNTU") {
 } elseif ($OS -eq "WINDOW") {
 	$OvfPath = "src/main/resources/window/WindowServer.ovf"
 }
-Connect-VIServer "192.168.0.112" -User root -Password Trung@65730208 -SaveCredentials | Out-Null
+Connect-VIServer "$IpServer" -User $ServerUsername -Password $Password -SaveCredentials | Out-Null
 $existVM = Get-VM -Name $Name -ErrorAction SilentlyContinue
 If (!$existVM) {
-	Import-VApp -Name $Name -Source $OvfPath -VMHost 192.168.0.112 -Datastore datastore1 -DiskStorageFormat Thin | Out-Null
+	Import-VApp -Name $Name -Source $OvfPath -VMHost $IpServer -Datastore datastore1 -DiskStorageFormat Thin | Out-Null
 	#Set CPU RAM Storage
 	Set-VM -VM $Name -NumCpu $CPU -MemoryGB $RAM -Confirm:$false | Out-Null
 

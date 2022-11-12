@@ -1,5 +1,8 @@
-$Name = $args[0]
-Connect-VIServer "192.168.0.112" -User root -Password Trung@65730208 -SaveCredentials | Out-Null
+$IpServer = $args[0]
+$ServerUsername = $args[1]
+$Password = $args[2]
+$Name = $args[3]
+Connect-VIServer "$IpServer" -User $ServerUsername -Password $Password -SaveCredentials | Out-Null
 $found = 0
 
 while ($found -ne 1) {

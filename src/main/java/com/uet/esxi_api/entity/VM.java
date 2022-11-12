@@ -39,6 +39,21 @@ public class VM {
 	@Column(nullable = false)
 	private String os;
 	
+	@Column(nullable = false)
+	private String state;
+	
+	@Column(nullable = true)
+	private String ip;
+	
+	@Column(nullable = false)
+	private Integer numCPU;
+	
+	@Column(nullable = false)
+	private Integer ramGB;
+	
+	@Column(nullable = false)
+	private Integer storage;
+	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "vm_id", referencedColumnName = "id")

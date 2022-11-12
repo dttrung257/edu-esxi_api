@@ -1,6 +1,9 @@
-$Name = $args[0]
-$Storage = $args[1]
-Connect-VIServer "192.168.0.112" -User root -Password Trung@65730208 -SaveCredentials | Out-Null
+$IpServer = $args[0]
+$ServerUsername = $args[1]
+$Password = $args[2]
+$Name = $args[3]
+$Storage = $args[4]
+Connect-VIServer "$IpServer" -User $ServerUsername -Password $Password -SaveCredentials | Out-Null
 If ((Get-HardDisk -VM $Name).CapacityGB -lt $Storage) {
 	Get-HardDisk -VM $Name | Set-HardDisk -CapacityGB $Storage -Confirm:$false  | Out-Null
 	If ((Get-HardDisk -VM $Name).CapacityGB -eq $Storage) {
