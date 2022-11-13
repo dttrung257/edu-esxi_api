@@ -83,8 +83,15 @@ public class VMController {
 		vm.setUser(user);
 
 		String createVMCmd = String.format(
-				"PowerShell -File \"src/main/resources/create_VM.ps1\" %s %s %s %s %s %d %d %d", serverIp,
-				serverUsername, serverPassword, name, os.toUpperCase(), numCPU, ramGB, storage);
+				"PowerShell -File \"src/main/resources/create_VM.ps1\" %s %s %s %s %s %d %d %d", 
+				serverIp, 
+				serverUsername, 
+				serverPassword, 
+				name, 
+				os.toUpperCase(), 
+				numCPU, 
+				ramGB, 
+				storage);
 		try (PowerShell psSession = PowerShell.open()) {
 			String ip = psSession.executeCommands(createVMCmd);
 			vm.setState(VMState.STATE_POWERED_ON);
@@ -102,8 +109,12 @@ public class VMController {
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
 		}
-		String deleteVMCmd = String.format("PowerShell -File \"src/main/resources/delete_VM.ps1\" %s %s %s %s",
-				serverIp, serverUsername, serverPassword, name);
+		String deleteVMCmd = String.format(
+				"PowerShell -File \"src/main/resources/delete_VM.ps1\" %s %s %s %s",
+				serverIp, 
+				serverUsername, 
+				serverPassword, 
+				name);
 		try (PowerShell psSession = PowerShell.open()) {
 			String response = psSession.executeCommands(deleteVMCmd);
 			vmService.deleteVM(vm);
@@ -138,13 +149,21 @@ public class VMController {
 		if (vm.getState().equals(VMState.STATE_POWERED_ON)) {
 			throw new VMAlreadyInStateException("VM " + name + " already in power on state");
 		}
-		String startVMCmd = String.format("PowerShell -File \"src/main/resources/start_VM.ps1\" %s %s %s %s", serverIp,
-				serverUsername, serverPassword, name);
+		String startVMCmd = String.format(
+				"PowerShell -File \"src/main/resources/start_VM.ps1\" %s %s %s %s", 
+				serverIp,
+				serverUsername, 
+				serverPassword, 
+				name);
 		try (PowerShell psSession = PowerShell.open()) {
 			psSession.executeCommands(startVMCmd);
 			if (vm.getState().equals(VMState.STATE_POWERED_OFF)) {
-				String getIpVMCmd = String.format("PowerShell -File \"src/main/resources/get_ip_VM.ps1\" %s %s %s %s",
-						serverIp, serverUsername, serverPassword, name);
+				String getIpVMCmd = String.format(
+						"PowerShell -File \"src/main/resources/get_ip_VM.ps1\" %s %s %s %s",
+						serverIp, 
+						serverUsername, 
+						serverPassword, 
+						name);
 				String ip = psSession.executeCommands(getIpVMCmd).replace("\n", "");
 				vm.setIp(ip);
 				vm.setState(VMState.STATE_POWERED_ON);
@@ -170,8 +189,12 @@ public class VMController {
 		if (vm.getState().equals(VMState.STATE_POWERED_OFF)) {
 			throw new CannotSuspendVMException("Unable to go to suspend state while virtual machine is shutting down");
 		}
-		String suspendVMCmd = String.format("PowerShell -File \"src/main/resources/suspend_VM.ps1\" %s %s %s %s",
-				serverIp, serverUsername, serverPassword, name);
+		String suspendVMCmd = String.format(
+				"PowerShell -File \"src/main/resources/suspend_VM.ps1\" %s %s %s %s",
+				serverIp, 
+				serverUsername, 
+				serverPassword, 
+				name);
 		try (PowerShell psSession = PowerShell.open()) {
 			psSession.executeCommands(suspendVMCmd);
 			vm.setState(VMState.STATE_SUSPENDED);
@@ -193,8 +216,12 @@ public class VMController {
 		if (vm.getState().equals(VMState.STATE_POWERED_OFF)) {
 			throw new VMAlreadyInStateException("VM " + name + " already in power off state");
 		}
-		String stopVMCmd = String.format("PowerShell -File \"src/main/resources/stop_VM.ps1\" %s %s %s %s", serverIp,
-				serverUsername, serverPassword, name);
+		String stopVMCmd = String.format(
+				"PowerShell -File \"src/main/resources/stop_VM.ps1\" %s %s %s %s", 
+				serverIp,
+				serverUsername, 
+				serverPassword, 
+				name);
 		try (PowerShell psSession = PowerShell.open()) {
 			psSession.executeCommands(stopVMCmd);
 			vm.setState(VMState.STATE_POWERED_OFF);
@@ -219,11 +246,15 @@ public class VMController {
 			throw new CannotUpdateVMException("you can only update the VM when it's turned off");
 		}
 		if (vm.getStorage() >= storageGB) {
-			throw new CannotUpdateStorageException(
-					"You can only increase the hard drive capacity of the virtual machine");
+			throw new CannotUpdateStorageException("You can only increase the hard drive capacity of the virtual machine");
 		}
-		String updateHardDiskVMCmd = String.format("PowerShell -File \"src/main/resources/update_hard_disk_VM.ps1\" %s %s %s %s %d",
-				serverIp, serverUsername, serverPassword, name, storageGB);
+		String updateHardDiskVMCmd = String.format(
+				"PowerShell -File \"src/main/resources/update_hard_disk_VM.ps1\" %s %s %s %s %d",
+				serverIp, 
+				serverUsername, 
+				serverPassword, 
+				name, 
+				storageGB);
 		try (PowerShell psSession = PowerShell.open()) {
 			psSession.executeCommands(updateHardDiskVMCmd);
 			vm.setStorage(storageGB);
@@ -256,8 +287,14 @@ public class VMController {
 		if (!vm.getState().equals(VMState.STATE_POWERED_OFF)) {
 			throw new CannotUpdateVMException("you can only update the VM when it's turned off");
 		}
-		String updateCpuRamVMCmd = String.format("PowerShell -File \"src/main/resources/update_CPU_RAM_VM.ps1\" %s %s %s %s %d %d",
-				serverIp, serverUsername, serverPassword, updateCpuRam.getName(), updateCpuRam.getNumCPU(), updateCpuRam.getRamGB());
+		String updateCpuRamVMCmd = String.format(
+				"PowerShell -File \"src/main/resources/update_CPU_RAM_VM.ps1\" %s %s %s %s %d %d",
+				serverIp, 
+				serverUsername, 
+				serverPassword, 
+				updateCpuRam.getName(), 
+				updateCpuRam.getNumCPU(), 
+				updateCpuRam.getRamGB());
 		try (PowerShell psSession = PowerShell.open()) {
 			psSession.executeCommands(updateCpuRamVMCmd);
 			vm.setNumCPU(updateCpuRam.getNumCPU());
