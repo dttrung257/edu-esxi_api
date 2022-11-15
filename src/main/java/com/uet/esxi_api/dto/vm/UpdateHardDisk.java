@@ -12,12 +12,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateCpuRam {
-	@NotNull(message = "Cpu field cannot be null")
+public class UpdateHardDisk {
+	@NotNull(message = "storage field is mandatory")
 	@Min(value = 1)
-	private Integer numCPU;
-	
-	@NotNull(message = "Ram field cannot be null")
-	@Min(value = 1)
-	private Integer ramGB;
+	private Integer storage;
 }

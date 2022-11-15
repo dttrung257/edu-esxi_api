@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +26,8 @@ import com.github.tuupertunut.powershelllibjava.PowerShell;
 import com.github.tuupertunut.powershelllibjava.PowerShellExecutionException;
 import com.uet.esxi_api.dto.vm.NewVM;
 import com.uet.esxi_api.dto.vm.UpdateCpuRam;
+import com.uet.esxi_api.dto.vm.UpdateHardDisk;
+import com.uet.esxi_api.dto.vm.UpdateState;
 import com.uet.esxi_api.entity.OSName;
 import com.uet.esxi_api.entity.VM;
 import com.uet.esxi_api.entity.VMState;
@@ -36,6 +38,7 @@ import com.uet.esxi_api.exception.vm.CannotUpdateVMException;
 import com.uet.esxi_api.exception.vm.InsufficientConfigurationParametersException;
 import com.uet.esxi_api.exception.vm.InvalidOSNameException;
 import com.uet.esxi_api.exception.vm.NotFoundVMException;
+import com.uet.esxi_api.exception.vm.NotFoundVMStateException;
 import com.uet.esxi_api.exception.vm.VMAlreadyInStateException;
 import com.uet.esxi_api.service.VMService;
 
@@ -52,7 +55,7 @@ public class VMController {
 	@Autowired
 	private VMService vmService;
 
-	@PostMapping("/VM/create_VM")
+	@PostMapping("/VMs")
 	public ResponseEntity<Object> createVM(@Valid @RequestBody NewVM newVM) {
 		final String name = newVM.getName();
 		final String os = newVM.getOs();
@@ -103,8 +106,9 @@ public class VMController {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to create VM " + newVM.getName());
 	}
 
-	@GetMapping("/VM/delete_VM/{name}")
-	public ResponseEntity<Object> deleteVM(@PathVariable("name") @NotBlank String name) {
+	@DeleteMapping("/VMs/{name}")
+	public ResponseEntity<Object> deleteVM(
+			@PathVariable(name = "name", required = true) @NotBlank String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
@@ -125,7 +129,7 @@ public class VMController {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to delete VM " + name);
 	}
 
-	@GetMapping("/VM/get_info_VM")
+	@GetMapping("/VMs")
 	public ResponseEntity<Object> getInfoVM() {
 		WebUser user = (WebUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		List<VM> vms = new ArrayList<>();
@@ -139,9 +143,23 @@ public class VMController {
 		});
 		return ResponseEntity.ok(vms);
 	}
+	
+	@PutMapping("/VMs/{name}/state")
+	public ResponseEntity<Object> updateState(
+			@Valid @RequestBody UpdateState updateState,
+			@PathVariable("name") @NotBlank(message = "name field is mandatory") String name) {
+		if (updateState.getState().equalsIgnoreCase(VMState.STATE_POWERED_ON)) {
+			return startVM(name);
+		} else if (updateState.getState().equalsIgnoreCase(VMState.STATE_SUSPENDED)) {
+			return suspendVM(name);
+		} else if (updateState.getState().equalsIgnoreCase(VMState.STATE_POWERED_OFF)) {
+			return stopVM(name);
+		} else {
+			throw new NotFoundVMStateException("Not found VM state: " + updateState.getState());
+		}
+	}
 
-	@GetMapping("/VM/start_VM/{name}")
-	public ResponseEntity<Object> startVM(@PathVariable("name") @NotBlank String name) {
+	private ResponseEntity<Object> startVM(String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
@@ -177,8 +195,7 @@ public class VMController {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to start VM " + name);
 	}
 
-	@GetMapping("/VM/suspend_VM/{name}")
-	public ResponseEntity<Object> suspendVM(@PathVariable("name") @NotBlank String name) {
+	private ResponseEntity<Object> suspendVM(String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
@@ -207,8 +224,7 @@ public class VMController {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to suspend VM " + name);
 	}
 
-	@GetMapping("/VM/stop_VM/{name}")
-	public ResponseEntity<Object> stopVM(@PathVariable("name") @NotBlank String name) {
+	private ResponseEntity<Object> stopVM(String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
@@ -233,11 +249,10 @@ public class VMController {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to suspend VM " + name);
 	}
 
-	@GetMapping("/VM/update_hard_disk_VM")
+	@PutMapping("/VMs/{name}/hard_disk")
 	public ResponseEntity<Object> updateHardDisk(
-			@Param("name") @NotBlank String name,
-			@Param("storage") @Min(value = 1) String storage) {
-		Integer storageGB = Integer.parseInt(storage);
+			@Valid @RequestBody UpdateHardDisk updateHardDisk,
+			@PathVariable(name = "name", required = true) @NotBlank(message = "name field is mandatory") String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
@@ -245,7 +260,7 @@ public class VMController {
 		if (!vm.getState().equals(VMState.STATE_POWERED_OFF)) {
 			throw new CannotUpdateVMException("you can only update the VM when it's turned off");
 		}
-		if (vm.getStorage() >= storageGB) {
+		if (vm.getStorage() >= updateHardDisk.getStorage()) {
 			throw new CannotUpdateStorageException("You can only increase the hard drive capacity of the virtual machine");
 		}
 		String updateHardDiskVMCmd = String.format(
@@ -254,10 +269,10 @@ public class VMController {
 				serverUsername, 
 				serverPassword, 
 				name, 
-				storageGB);
+				updateHardDisk.getStorage());
 		try (PowerShell psSession = PowerShell.open()) {
 			psSession.executeCommands(updateHardDiskVMCmd);
-			vm.setStorage(storageGB);
+			vm.setStorage(updateHardDisk.getStorage());
 			return ResponseEntity.ok(vmService.save(vm));
 		} catch (IOException | PowerShellExecutionException ex) {
 			ex.printStackTrace();
@@ -265,11 +280,13 @@ public class VMController {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to update hard disk VM " + name);
 	}
 	
-	@PostMapping("/VM/update_cpu_ram_VM")
-	public ResponseEntity<Object> updateRamCpu(@Valid @RequestBody UpdateCpuRam updateCpuRam) {
-		VM vm = vmService.findByName(updateCpuRam.getName());
+	@PutMapping("/VMs/{name}/CPU_RAM")
+	public ResponseEntity<Object> updateRamCpu(
+			@Valid @RequestBody UpdateCpuRam updateCpuRam,
+			@PathVariable(name = "name", required = true) @NotBlank(message = "name field is mandatory") String name) {
+		VM vm = vmService.findByName(name);
 		if (vm == null) {
-			throw new NotFoundVMException("Not found VM with name: " + updateCpuRam.getName());
+			throw new NotFoundVMException("Not found VM with name: " + name);
 		}
 		if (vm.getNumCPU() == updateCpuRam.getNumCPU() && vm.getRamGB() == updateCpuRam.getRamGB()) {
 			return ResponseEntity.ok(vm);
@@ -292,7 +309,7 @@ public class VMController {
 				serverIp, 
 				serverUsername, 
 				serverPassword, 
-				updateCpuRam.getName(), 
+				name, 
 				updateCpuRam.getNumCPU(), 
 				updateCpuRam.getRamGB());
 		try (PowerShell psSession = PowerShell.open()) {
@@ -303,6 +320,6 @@ public class VMController {
 		} catch (IOException | PowerShellExecutionException ex) {
 			ex.printStackTrace();
 		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to update CPU or RAM VM " + updateCpuRam.getName());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to update CPU or RAM VM " + name);
 	}
 }

@@ -21,6 +21,7 @@ import com.uet.esxi_api.exception.vm.CannotUpdateVMException;
 import com.uet.esxi_api.exception.vm.InsufficientConfigurationParametersException;
 import com.uet.esxi_api.exception.vm.InvalidOSNameException;
 import com.uet.esxi_api.exception.vm.NotFoundVMException;
+import com.uet.esxi_api.exception.vm.NotFoundVMStateException;
 import com.uet.esxi_api.exception.vm.VMAlreadyExistsException;
 import com.uet.esxi_api.exception.vm.VMAlreadyInStateException;
 
@@ -71,6 +72,13 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(NotFoundVMException.class)
 	ResponseEntity<Object> handleNotFoundVMException(NotFoundVMException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.NOT_FOUND.value(), "Not found VM",
+				e.getMessage());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
+	}
+	
+	@ExceptionHandler(NotFoundVMStateException.class)
+	ResponseEntity<Object> handleNotFoundVMStateException(NotFoundVMStateException e) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.NOT_FOUND.value(), "Not found VM state",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
 	}
