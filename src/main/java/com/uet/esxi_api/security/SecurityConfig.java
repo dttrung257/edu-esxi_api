@@ -1,9 +1,5 @@
 package com.uet.esxi_api.security;
 
-import java.util.Collections;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.uet.esxi_api.security.filter.JwtFilter;
 import com.uet.esxi_api.security.provider.CustomAuthenticationProvider;
 
 @Configuration
@@ -28,6 +24,8 @@ public class SecurityConfig {
 	private CustomAccessDeniedHandler customAccessDeniedHandler;
 	@Autowired
 	private AuthenEntryPoint authenEntryPoint;
+	@Autowired
+	private JwtFilter jwtFilter;
 	
 	@Bean
 	public AuthenticationManager buildAuthenticationManager(HttpSecurity http) throws Exception {
@@ -38,17 +36,7 @@ public class SecurityConfig {
 	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.cors().configurationSource(new CorsConfigurationSource() {	
-			@Override
-			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-				CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedHeaders(Collections.singletonList("*"));
-                config.setAllowedMethods(Collections.singletonList("*"));
-                config.addAllowedOrigin("*");
-                config.setAllowCredentials(true);
-                return config;
-			}
-		})
+		http.cors()
 			.and()
 			.csrf().disable()
 			.exceptionHandling()
@@ -61,8 +49,9 @@ public class SecurityConfig {
 				.anyRequest().authenticated();
 			})
 			.sessionManagement(session -> {
-				session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 			});
+		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 

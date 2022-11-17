@@ -131,4 +131,11 @@ public class GlobalExceptionHandler {
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
+	
+	@ExceptionHandler(InvalidJwtToken.class)
+	ResponseEntity<Object> handleInvalidJwtToken(InvalidJwtToken e) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "Jwt token is invalid",
+				e.getMessage());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
+	}
 }
