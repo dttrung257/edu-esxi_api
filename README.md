@@ -41,7 +41,8 @@ and and set up java in environment variable.
     ```
 **Second step, install VMware ESXI**
 * Turn on VMware ESXI on your computer.
-Third step, configure to connect to ESXI
+
+**Third step, configure to connect to ESXI**
 * Go to the file **application.properties** (src/main/resources/application.properties) edit the information of ESXI :
     ``` 
     esxi_server.ip=?
