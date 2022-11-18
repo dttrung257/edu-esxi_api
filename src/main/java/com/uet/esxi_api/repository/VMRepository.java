@@ -15,5 +15,5 @@ public interface VMRepository extends JpaRepository<VM, UUID> {
 	Optional<VM> findByName(@Param("name") String name);
 	
 	@Query("SELECT vm FROM VM vm WHERE vm.user.id = :userId")
-	List<VM> getListVMName(@Param("userId") UUID userId);
+	List<VM> getVMs(@Param("userId") UUID userId);
 }

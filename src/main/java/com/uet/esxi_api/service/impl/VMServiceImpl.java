@@ -41,8 +41,8 @@ public class VMServiceImpl implements VMService {
 	}
 
 	@Override
-	public List<VM> getListVMName(UUID userId) {
-		return vmRepository.getListVMName(userId);
+	public List<VM> getVMs(UUID userId) {
+		return vmRepository.getVMs(userId);
 	}
 
 	

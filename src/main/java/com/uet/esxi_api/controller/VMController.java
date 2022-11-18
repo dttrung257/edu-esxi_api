@@ -3,6 +3,8 @@ package com.uet.esxi_api.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -130,10 +132,10 @@ public class VMController {
 	}
 
 	@GetMapping("/VMs")
-	public ResponseEntity<Object> getInfoVM() {
+	public ResponseEntity<Object> getInfoVMs() {
 		WebUser user = (WebUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		List<VM> vms = new ArrayList<>();
-		vmService.getListVMName(user.getId()).forEach(vm -> {
+		vmService.getVMs(user.getId()).forEach(vm -> {
 			if (vm.getState().equals(VMState.STATE_SUSPENDED)) {
 				vm.setIp(null);
 				vms.add(vm);
@@ -142,6 +144,23 @@ public class VMController {
 			}
 		});
 		return ResponseEntity.ok(vms);
+	}
+	
+	@GetMapping("/VMs/{name}")
+	public ResponseEntity<Object> getInfoVM(
+			@PathVariable("name") @NotBlank(message = "name field is mandatory") String name) {
+		WebUser user = (WebUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		List<VM> vms = new ArrayList<>();
+		vmService.getVMs(user.getId()).forEach(vm -> {
+			if (vm.getState().equals(VMState.STATE_SUSPENDED)) {
+				vm.setIp(null);
+				vms.add(vm);
+			} else {
+				vms.add(vm);
+			}
+		});
+		return ResponseEntity.ok(
+				vms.stream().filter(vm -> (vm.getName().equals(name))).collect(Collectors.toList()).get(0));
 	}
 	
 	@PutMapping("/VMs/{name}/state")

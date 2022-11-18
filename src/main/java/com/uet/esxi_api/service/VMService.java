@@ -10,5 +10,5 @@ public interface VMService {
 	VM save(VM vm);
 	VM createVM(VM vm);
 	void deleteVM(VM vm);
-	List<VM> getListVMName(UUID userId);
+	List<VM> getVMs(UUID userId);
 }
