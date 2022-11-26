@@ -31,4 +31,6 @@ public class NewVM {
 	@NotNull
 	@Min(value = 4, message = "Storage field must greater than or equal to 4")
 	private Integer storage;
+	
+	private String publicKey;
 }

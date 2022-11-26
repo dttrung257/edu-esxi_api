@@ -3,7 +3,6 @@ package com.uet.esxi_api.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -41,6 +40,7 @@ import com.uet.esxi_api.exception.vm.InsufficientConfigurationParametersExceptio
 import com.uet.esxi_api.exception.vm.InvalidOSNameException;
 import com.uet.esxi_api.exception.vm.NotFoundVMException;
 import com.uet.esxi_api.exception.vm.NotFoundVMStateException;
+import com.uet.esxi_api.exception.vm.VMAlreadyExistsException;
 import com.uet.esxi_api.exception.vm.VMAlreadyInStateException;
 import com.uet.esxi_api.service.VMService;
 
@@ -60,10 +60,15 @@ public class VMController {
 	@PostMapping("/VMs")
 	public ResponseEntity<Object> createVM(@Valid @RequestBody NewVM newVM) {
 		final String name = newVM.getName();
+		VM check = vmService.findByName(name);
+		if (check != null) {
+			throw new VMAlreadyExistsException("VM with name: " + name + " already exists");
+		}
 		final String os = newVM.getOs();
 		final Integer numCPU = newVM.getNumCPU();
 		final Integer ramGB = newVM.getRamGB();
 		final Integer storage = newVM.getStorage();
+		final String publicKey = "\"" + newVM.getPublicKey() + "\"";
 		
 		if (!(os.equalsIgnoreCase(OSName.OS_UBUNTU) || os.equalsIgnoreCase(OSName.OS_WINDOW))) {
 			throw new InvalidOSNameException("OS name " + os.toUpperCase() + " is invalid");
@@ -88,7 +93,7 @@ public class VMController {
 		vm.setUser(user);
 
 		String createVMCmd = String.format(
-				"PowerShell -File \"src/main/resources/create_VM.ps1\" %s %s %s %s %s %d %d %d", 
+				"PowerShell -File \"src/main/resources/create_VM.ps1\" %s %s %s %s %s %d %d %d %s", 
 				serverIp, 
 				serverUsername, 
 				serverPassword, 
@@ -96,7 +101,8 @@ public class VMController {
 				os.toUpperCase(), 
 				numCPU, 
 				ramGB, 
-				storage);
+				storage,
+				publicKey);
 		try (PowerShell psSession = PowerShell.open()) {
 			String ip = psSession.executeCommands(createVMCmd);
 			vm.setState(VMState.STATE_POWERED_ON);

@@ -14,6 +14,7 @@ public class CORSConfig implements WebMvcConfigurer {
         		.allowCredentials(false)
         		.allowedOrigins("*")
         		.allowedHeaders("*")
+        		.allowedMethods("*")
         		.maxAge(-1);
     }
 

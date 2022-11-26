@@ -7,6 +7,7 @@ $OS = $args[4]
 $CPU = $args[5]
 $RAM = $args[6]
 $Storage = $args[7]
+$PublicKey = $args[8]
 $OvfPath
 
 If ($OS -eq "UBUNTU") {
@@ -36,6 +37,10 @@ If (!$existVM) {
 			$found = 1
 			Write-Host $ip
 		}
+	}
+
+	If ($PublicKey -And $OS -eq "UBUNTU") {
+		Invoke-VMScript -VM $Name -ScriptText "mkdir ~/.ssh;touch ~/.ssh/authorized_keys; echo $PublicKey >> ~/.ssh/authorized_keys; history -c" -GuestUser uuser -GuestPassword "123" | Out-Null
 	}
 }
 

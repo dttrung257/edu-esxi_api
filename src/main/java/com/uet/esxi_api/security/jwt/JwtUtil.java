@@ -41,6 +41,7 @@ public class JwtUtil {
 	
 	public boolean verifyJwtToken(String token) {
 		final SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
+		//System.out.println(token);
 		try {
 			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
 			return true;
