@@ -28,112 +28,112 @@ import com.uet.esxi_api.exception.vm.VMAlreadyInStateException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+	public ResponseEntity<ErrorDetails> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "Incorrect request format",
 				e.getAllErrors().stream().map(objectError -> objectError.getDefaultMessage()).collect(Collectors.toList()));
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(ValidationException.class)
-	ResponseEntity<Object> handleValidationException(ValidationException e) {
+	public ResponseEntity<ErrorDetails> handleValidationException(ValidationException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "Incorrect request format",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(AccessDeniedException.class)
-	ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException e) {
+	public ResponseEntity<ErrorDetails> handleAccessDeniedException(AccessDeniedException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.FORBIDDEN.value(), "Access is denied",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetails);
 	}
 
 	@ExceptionHandler(AuthenticationException.class)
-	ResponseEntity<Object> handleAuthenticationException(AuthenticationException e) {
+	public ResponseEntity<ErrorDetails> handleAuthenticationException(AuthenticationException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.UNAUTHORIZED.value(), "Unauthorized",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorDetails);
 	}
 
 	@ExceptionHandler(UsernameNotFoundException.class)
-	ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException e) {
+	public ResponseEntity<ErrorDetails> handleUsernameNotFoundException(UsernameNotFoundException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.NOT_FOUND.value(),
 				"Username or password is incorrect", e.getMessage());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
 	}
 
 	@ExceptionHandler(IncorrectPasswordException.class)
-	ResponseEntity<Object> handleIncorrectPasswordException(IncorrectPasswordException e) {
+	public ResponseEntity<ErrorDetails> handleIncorrectPasswordException(IncorrectPasswordException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(),
 				"Username or password is incorrect", e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 
 	@ExceptionHandler(NotFoundVMException.class)
-	ResponseEntity<Object> handleNotFoundVMException(NotFoundVMException e) {
+	public ResponseEntity<ErrorDetails> handleNotFoundVMException(NotFoundVMException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.NOT_FOUND.value(), "Not found VM",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
 	}
 	
 	@ExceptionHandler(NotFoundVMStateException.class)
-	ResponseEntity<Object> handleNotFoundVMStateException(NotFoundVMStateException e) {
+	public ResponseEntity<ErrorDetails> handleNotFoundVMStateException(NotFoundVMStateException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.NOT_FOUND.value(), "Not found VM state",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
 	}
 	
 	@ExceptionHandler(VMAlreadyExistsException.class)
-	ResponseEntity<Object> handleVMAlreadyExistsException(VMAlreadyExistsException e) {
+	public ResponseEntity<ErrorDetails> handleVMAlreadyExistsException(VMAlreadyExistsException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "VM already exists",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(VMAlreadyInStateException.class)
-	ResponseEntity<Object> handleVMAlreadyInStateException(VMAlreadyInStateException e) {
+	public ResponseEntity<ErrorDetails> handleVMAlreadyInStateException(VMAlreadyInStateException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "VM already in this state",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(CannotSuspendVMException.class)
-	ResponseEntity<Object> handleCannotSuspendVMException(CannotSuspendVMException e) {
+	public ResponseEntity<ErrorDetails> handleCannotSuspendVMException(CannotSuspendVMException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "Unable to go to suspend state while virtual machine is shutting down",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(CannotUpdateVMException.class)
-	ResponseEntity<Object> handleCannotUpdateVMException(CannotUpdateVMException e) {
+	public ResponseEntity<ErrorDetails> handleCannotUpdateVMException(CannotUpdateVMException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "you can only update the VM when it's turned off",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(CannotUpdateStorageException.class)
-	ResponseEntity<Object> handleCannotUpdateStorageException(CannotUpdateStorageException e) {
+	public ResponseEntity<ErrorDetails> handleCannotUpdateStorageException(CannotUpdateStorageException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "You can only increase the hard drive capacity of the virtual machine",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(InsufficientConfigurationParametersException.class)
-	ResponseEntity<Object> handleInsufficientConfigurationParametersException(InsufficientConfigurationParametersException e) {
+	public ResponseEntity<ErrorDetails> handleInsufficientConfigurationParametersException(InsufficientConfigurationParametersException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "Configuration parameters are not enough",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(InvalidOSNameException.class)
-	ResponseEntity<Object> handleInvalidOSNameException(InvalidOSNameException e) {
+	public ResponseEntity<ErrorDetails> handleInvalidOSNameException(InvalidOSNameException e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "OS name is invalid",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
 	}
 	
 	@ExceptionHandler(InvalidJwtToken.class)
-	ResponseEntity<Object> handleInvalidJwtToken(InvalidJwtToken e) {
+	public ResponseEntity<ErrorDetails> handleInvalidJwtToken(InvalidJwtToken e) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), HttpStatus.BAD_REQUEST.value(), "Jwt token is invalid",
 				e.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);

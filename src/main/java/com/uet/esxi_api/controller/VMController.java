@@ -58,7 +58,7 @@ public class VMController {
 	private VMService vmService;
 
 	@PostMapping("/VMs")
-	public ResponseEntity<Object> createVM(@Valid @RequestBody NewVM newVM) {
+	public ResponseEntity<?> createVM(@Valid @RequestBody NewVM newVM) {
 		final String name = newVM.getName();
 		VM check = vmService.findByName(name);
 		if (check != null) {
@@ -115,7 +115,7 @@ public class VMController {
 	}
 
 	@DeleteMapping("/VMs/{name}")
-	public ResponseEntity<Object> deleteVM(
+	public ResponseEntity<String> deleteVM(
 			@PathVariable(name = "name", required = true) @NotBlank String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
@@ -138,7 +138,7 @@ public class VMController {
 	}
 
 	@GetMapping("/VMs")
-	public ResponseEntity<Object> getInfoVMs() {
+	public ResponseEntity<List<VM>> getInfoVMs() {
 		WebUser user = (WebUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		List<VM> vms = new ArrayList<>();
 		vmService.getVMs(user.getId()).forEach(vm -> {
@@ -153,7 +153,7 @@ public class VMController {
 	}
 	
 	@GetMapping("/VMs/{name}")
-	public ResponseEntity<Object> getInfoVM(
+	public ResponseEntity<VM> getInfoVM(
 			@PathVariable("name") @NotBlank(message = "name field is mandatory") String name) {
 		WebUser user = (WebUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		List<VM> vms = new ArrayList<>();
@@ -170,7 +170,7 @@ public class VMController {
 	}
 	
 	@PutMapping("/VMs/{name}/state")
-	public ResponseEntity<Object> updateState(
+	public ResponseEntity<?> updateState(
 			@Valid @RequestBody UpdateState updateState,
 			@PathVariable("name") @NotBlank(message = "name field is mandatory") String name) {
 		if (updateState.getState().equalsIgnoreCase(VMState.STATE_POWERED_ON)) {
@@ -184,7 +184,7 @@ public class VMController {
 		}
 	}
 
-	private ResponseEntity<Object> startVM(String name) {
+	private ResponseEntity<?> startVM(String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
@@ -220,7 +220,7 @@ public class VMController {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to start VM " + name);
 	}
 
-	private ResponseEntity<Object> suspendVM(String name) {
+	private ResponseEntity<?> suspendVM(String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
@@ -249,7 +249,7 @@ public class VMController {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail to suspend VM " + name);
 	}
 
-	private ResponseEntity<Object> stopVM(String name) {
+	private ResponseEntity<?> stopVM(String name) {
 		VM vm = vmService.findByName(name);
 		if (vm == null) {
 			throw new NotFoundVMException("Not found VM with name: " + name);
@@ -275,7 +275,7 @@ public class VMController {
 	}
 
 	@PutMapping("/VMs/{name}/hard_disk")
-	public ResponseEntity<Object> updateHardDisk(
+	public ResponseEntity<?> updateHardDisk(
 			@Valid @RequestBody UpdateHardDisk updateHardDisk,
 			@PathVariable(name = "name", required = true) @NotBlank(message = "name field is mandatory") String name) {
 		VM vm = vmService.findByName(name);
@@ -306,7 +306,7 @@ public class VMController {
 	}
 	
 	@PutMapping("/VMs/{name}/CPU_RAM")
-	public ResponseEntity<Object> updateRamCpu(
+	public ResponseEntity<?> updateRamCpu(
 			@Valid @RequestBody UpdateCpuRam updateCpuRam,
 			@PathVariable(name = "name", required = true) @NotBlank(message = "name field is mandatory") String name) {
 		VM vm = vmService.findByName(name);
