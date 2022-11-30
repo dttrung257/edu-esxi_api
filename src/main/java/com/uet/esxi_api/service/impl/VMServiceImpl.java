@@ -98,6 +98,7 @@ public class VMServiceImpl implements VMService {
 			vmRepository.save(vm);
 			return vm;
 		} catch (IOException | PowerShellExecutionException ex) {
+			ex.printStackTrace();
 			throw new FailToCreateVMException("Fail to create VM");
 		}
 	}
@@ -114,6 +115,7 @@ public class VMServiceImpl implements VMService {
 			psSession.executeCommands(deleteVMCmd);
 			vmRepository.delete(vm);
 		} catch (IOException | PowerShellExecutionException ex) {
+			ex.printStackTrace();
 			throw new FailToDeleteVMException("Fail to delete VM " + name);
 		}
 	}
@@ -184,6 +186,7 @@ public class VMServiceImpl implements VMService {
 			vm.setState(VMState.STATE_POWERED_ON);
 			return vmRepository.save(vm);
 		} catch (IOException | PowerShellExecutionException ex) {
+			ex.printStackTrace();
 			throw new FailToStartVMException("Fail to power on VM " + name);
 		}
 	}
@@ -212,6 +215,7 @@ public class VMServiceImpl implements VMService {
 			changedVM.setIp(null);
 			return changedVM;
 		} catch (IOException | PowerShellExecutionException ex) {
+			ex.printStackTrace();
 			throw new FailToSuspendVMException("Fail to suspend VM " + name);
 		}
 	}
@@ -236,6 +240,7 @@ public class VMServiceImpl implements VMService {
 			vm.setIp(null);
 			return vmRepository.save(vm);
 		} catch (IOException | PowerShellExecutionException ex) {
+			ex.printStackTrace();
 			throw new FailToStopVMException("Fail to power off VM " + name);
 		}
 	}
@@ -264,6 +269,7 @@ public class VMServiceImpl implements VMService {
 			vm.setStorage(updateHardDisk.getStorage());
 			return vmRepository.save(vm);
 		} catch (IOException | PowerShellExecutionException ex) {
+			ex.printStackTrace();
 			throw new FailToUpdateVMException("Fail to update hard disk VM " + name);
 		}
 	}
@@ -304,6 +310,7 @@ public class VMServiceImpl implements VMService {
 			vm.setRamGB(updateCpuRam.getRamGB());
 			return vmRepository.save(vm);
 		} catch (IOException | PowerShellExecutionException ex) {
+			ex.printStackTrace();
 			throw new FailToUpdateVMException("Fail to update CPU or RAM VM " + name);
 		}
 	}

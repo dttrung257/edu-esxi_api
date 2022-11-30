@@ -2,6 +2,8 @@ package com.uet.esxi_api.exception;
 
 import java.util.Date;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,6 +26,7 @@ import com.uet.esxi_api.exception.vm.VMAlreadyExistsException;
 import com.uet.esxi_api.exception.vm.VMAlreadyInStateException;
 
 @ControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class VMExceptionHandler {
 	@ExceptionHandler(NotFoundVMException.class)
 	public ResponseEntity<ErrorDetails> handleNotFoundVMException(NotFoundVMException e) {
